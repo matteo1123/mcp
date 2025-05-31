@@ -2,39 +2,47 @@
 
 tasks:
   - init: | # This runs once when the workspace is being built/prepared
-      echo "Adding deadsnakes PPA and installing Python 3.13..."
+      echo "Adding deadsnakes PPA and installing Python 3.13, pip, venv, dev tools, git, unzip..."
       sudo apt-get update -y
       # Install software-properties-common to get add-apt-repository
       sudo apt-get install -y software-properties-common
       # Add the deadsnakes PPA
       sudo add-apt-repository -y ppa:deadsnakes/ppa
       sudo apt-get update -y
-      # Attempt to install Python 3.13 and associated packages
-      # This will install the latest version of 3.13 available in the PPA (e.g., 3.13.2 if available)
-      sudo apt-get install -y python3.13 python3.13-pip python3.13-venv python3.13-dev git
-      echo "Python 3.13 installation attempt complete."
+      # Install Python 3.13 and associated packages, plus unzip
+      sudo apt-get install -y python3.13 python3.13-pip python3.13-venv python3.13-dev git unzip
       
-      # Optional: Make python3.13 the default python3 if desired
-      # This can sometimes have unintended consequences if other system tools expect a different python3
-      # Use with caution or manage with virtual environments / update-alternatives carefully.
-      # echo "Setting python3.13 as default python3 (optional step)..."
-      # sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.13 1
-      # sudo update-alternatives --install /usr/bin/pip3 pip3 /usr/bin/pip3.13 1
+      echo "Installing uv using pip3.13..."
+      # Install uv using the pip from our Python 3.13 installation
+      # This makes uv available system-wide
+      sudo pip3.13 install uv
+      echo "Python 3.13 and uv installation attempt complete."
       
-      # It's often better to create a virtual environment with the specific version:
-      echo "To use Python 3.13, create a virtual environment:"
-      echo "python3.13 -m venv .venv"
-      echo "source .venv/bin/activate"
+      echo "To use Python 3.13 for your project, consider creating a virtual environment:"
+      echo "  python3.13 -m venv .venv"
+      echo "  source .venv/bin/activate"
+      echo "Or using uv to manage it:"
+      echo "  uv venv"
+      echo "  source .venv/bin/activate"
+
 
     command: | # This runs every time the workspace starts
       echo "Workspace is ready!"
+      echo "----------------------------------------"
       echo "Available Python 3.13:"
       python3.13 --version
-      echo "Available pip for Python 3.13:"
+      echo "----------------------------------------"
+      echo "Available pip for Python 3.13 (pip3.13):"
       pip3.13 --version
+      echo "----------------------------------------"
+      echo "Available uv:"
+      uv --version
+      echo "----------------------------------------"
       echo "Default python3 version (might be different if not explicitly changed):"
       python3 --version
+      echo "----------------------------------------"
 
 vscode:
   extensions:
     - ms-python.python # Microsoft Python extension
+    - astral-sh.uv # Official Astral extension for uv (recommended)
